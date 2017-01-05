@@ -58,6 +58,7 @@ public class WearableService extends Service implements SensorEventListener {
     }
 
     /*Get the user selected options from the intent*/
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand");
         Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
@@ -66,7 +67,6 @@ public class WearableService extends Service implements SensorEventListener {
         String age = intent.getStringExtra(AGE_CHOICE);
         String height = intent.getStringExtra(HEIGHT_CHOICE);
         makeFile(gender, age, height);
-
         return Service.START_STICKY;
     }
 

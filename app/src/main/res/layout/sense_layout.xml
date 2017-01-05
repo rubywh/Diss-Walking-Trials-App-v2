@@ -8,7 +8,7 @@
     android:paddingLeft="15dp"
     android:paddingRight="15dp"
     android:paddingTop="15dp"
-    tools:context="ruby.trialappv2.MainActivity"
+    tools:context="ruby.trialappv2.SenseActivity"
     tools:deviceIds="wear">
 
     <LinearLayout

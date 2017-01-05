@@ -42,13 +42,14 @@ public class SenseActivity extends WearableActivity {
         gender = intent.getStringExtra(HeightListActivity.GENDER_CHOICE);
         age = intent.getStringExtra(HeightListActivity.AGE_CHOICE);
         height = intent.getStringExtra(HeightListActivity.HEIGHT_CHOICE);
+        System.out.println(gender + age + height);
     }
 
     /* When start clicked, start the sensing service unless it is already running*/
     public void onStartClick(View view) {
         ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if ("com.example.WearableService"
+            if ("com.ruby.trialappv2.WearableService"
                     .equals(service.service.getClassName())) {
                 Log.i(TAG, "Service already running!");
             }
