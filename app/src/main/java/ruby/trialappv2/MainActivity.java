@@ -6,6 +6,8 @@ import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.BoxInsetLayout;
 import android.view.View;
 
+/* Display A Begin button and on click, go to next activity (gender selection)*/
+
 public class MainActivity extends WearableActivity {
 
     private static final String TAG = "WearableActivity";
@@ -16,7 +18,6 @@ public class MainActivity extends WearableActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //  setAmbientEnabled();
 
     }
 
@@ -24,8 +25,6 @@ public class MainActivity extends WearableActivity {
     public void onBeginClick(View view) {
         Intent intent = new Intent(this, GenderListActivity.class);
         startActivity(intent);
-
+        finish();
     }
-
-
 }

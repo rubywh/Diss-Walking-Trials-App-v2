@@ -10,7 +10,8 @@ import android.view.View;
 import android.widget.Button;
 
 /**
- * Created by ruby__000 on 23/12/2016.
+ * An Activity that takes the user selected options
+ * and handles starting and stopping of the sensing service.
  */
 
 public class SenseActivity extends WearableActivity {
@@ -32,6 +33,7 @@ public class SenseActivity extends WearableActivity {
         setContentView(R.layout.sense_layout);
         setAmbientEnabled();
 
+
         mContainerView = (BoxInsetLayout) findViewById(R.id.container);
         mBtnView = (Button) findViewById(R.id.btn);
         mBtnView2 = (Button) findViewById(R.id.btn2);
@@ -42,6 +44,7 @@ public class SenseActivity extends WearableActivity {
         height = intent.getStringExtra(HeightListActivity.HEIGHT_CHOICE);
     }
 
+    /* When start clicked, start the sensing service unless it is already running*/
     public void onStartClick(View view) {
         ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
@@ -50,15 +53,18 @@ public class SenseActivity extends WearableActivity {
                 Log.i(TAG, "Service already running!");
             }
         }
-
+        //Send the intent with the user chosen values
         Intent toservice = new Intent(this, WearableService.class);
         toservice.putExtra(GENDER_CHOICE, gender);
         toservice.putExtra(AGE_CHOICE, age);
         toservice.putExtra(HEIGHT_CHOICE, height);
         this.startService(toservice);
+
+        //Make Start button invisible
         mBtnView.setVisibility(View.INVISIBLE);
     }
 
+    /*On click of stop button stop the running service and make the button invisible*/
     public void onStopClick(View view) {
         this.stopService(new Intent(this, WearableService.class));
         mBtnView2.setVisibility(View.INVISIBLE);

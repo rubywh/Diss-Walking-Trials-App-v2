@@ -11,9 +11,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-/**
- * Created by ruby__000 on 23/12/2016.
- */
+
+/* An Activity that allows the user to select their age from a list of options*/
 
 public class AgeListActivity extends Activity implements WearableListView.ClickListener {
 
@@ -21,6 +20,7 @@ public class AgeListActivity extends Activity implements WearableListView.ClickL
     public final static String GENDER_CHOICE = "Gender Chosen";
     private static ArrayList<Integer> listItems;
 
+    /* Set up an ArrayList of items to be added as list labels*/
     static {
         listItems = new ArrayList<Integer>();
         for (int i = 10; i <= 90; i++) {
@@ -45,6 +45,7 @@ public class AgeListActivity extends Activity implements WearableListView.ClickL
 
     }
 
+    /*Get the age selected and pass to next activity*/
     @Override
     public void onClick(WearableListView.ViewHolder viewHolder) {
         String age = listItems.get(viewHolder.getLayoutPosition()).toString();
@@ -67,11 +68,13 @@ public class AgeListActivity extends Activity implements WearableListView.ClickL
             inflater = LayoutInflater.from(c);
         }
 
+        /* Set up the listView */
         @Override
         public WearableListView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
             return new WearableListView.ViewHolder(inflater.inflate(R.layout.row_simple_item_layout, null));
         }
 
+        /*Set the text in the listView*/
         @Override
         public void onBindViewHolder(WearableListView.ViewHolder viewHolder, int i) {
             TextView view = (TextView) viewHolder.itemView.findViewById(R.id.textView);

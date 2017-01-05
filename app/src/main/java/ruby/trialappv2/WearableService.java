@@ -37,9 +37,6 @@ public class WearableService extends Service implements SensorEventListener {
         super.onCreate();
         Log.d(TAG, "startSensorService");
 
-
-        //this.makeFile(gender, age, height);
-        //fetch the system's SensorManager instance. get a reference to a service of the system by passing the name of the service
         senSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         //get accelerometer
         senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -49,6 +46,7 @@ public class WearableService extends Service implements SensorEventListener {
         senSensorManager.registerListener(this, senGyro, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
+    /*When a new sensor event received, execute a new AsyncTask for accelerometer and gyro*/
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
@@ -59,10 +57,10 @@ public class WearableService extends Service implements SensorEventListener {
         }
     }
 
+    /*Get the user selected options from the intent*/
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand");
         Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
-
 
         String gender = intent.getStringExtra(GENDER_CHOICE);
         String age = intent.getStringExtra(AGE_CHOICE);
@@ -78,6 +76,7 @@ public class WearableService extends Service implements SensorEventListener {
         if (senSensorManager != null) {
             senSensorManager.unregisterListener(this);
         }
+
         ps.flush();
         ps_gyro.flush();
         ps.close();
@@ -94,6 +93,7 @@ public class WearableService extends Service implements SensorEventListener {
         return null;
     }
 
+    /* Given gender/age/height make a file in external storage and set up print streams */
     public void makeFile(String gender, String age, String height) {
         androidpath = Environment.getExternalStorageDirectory().toString();
 
@@ -111,11 +111,14 @@ public class WearableService extends Service implements SensorEventListener {
         }
     }
 
+
+    /* Write a line in the accelerometer file */
     private class AccelerometerEventLoggerTask extends AsyncTask<SensorEvent, Void, Void> {
 
         @Override
         protected Void doInBackground(SensorEvent... events) {
             SensorEvent event = events[0];
+            //Set to 20dp for now
             String line = Long.toString(event.timestamp) + ";" +
                     String.format("%.20f", event.values[0]) + ";" +
                     String.format("%.20f", event.values[1]) + ";" +
@@ -125,15 +128,16 @@ public class WearableService extends Service implements SensorEventListener {
         }
     }
 
+    /* Write a line in the gyro file */
     private class GyroEventLoggerTask extends AsyncTask<SensorEvent, Void, Void> {
         @Override
         protected Void doInBackground(SensorEvent... events) {
             //Getting the event and values
             SensorEvent event = events[0];
-            String line = event.timestamp + ";" +
-                    event.values[0] + ";" +
-                    event.values[1] + ";" +
-                    event.values[2];
+            String line = Long.toString(event.timestamp) + ";" +
+                    String.format("%.20f", event.values[0]) + ";" +
+                    String.format("%.20f", event.values[1]) + ";" +
+                    String.format("%.20f", event.values[2]);
             ps_gyro.println(line);
             return null;
         }

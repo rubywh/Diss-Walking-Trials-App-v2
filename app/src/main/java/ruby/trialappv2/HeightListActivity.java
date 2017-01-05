@@ -11,9 +11,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-/**
- * Created by ruby__000 on 23/12/2016.
- */
+
+/* An Activity that allows the user to select their height from a list of options*/
 
 public class HeightListActivity extends Activity implements WearableListView.ClickListener {
     public final static String AGE_CHOICE = "Age Chosen";
@@ -21,6 +20,7 @@ public class HeightListActivity extends Activity implements WearableListView.Cli
     public final static String HEIGHT_CHOICE = "Height Chosen";
     private static ArrayList<Integer> listItems;
 
+    /* Set up an ArrayList of items to be added as list labels*/
     static {
         listItems = new ArrayList<Integer>();
         for (int i = 142; i < 210; i++) {
@@ -48,6 +48,8 @@ public class HeightListActivity extends Activity implements WearableListView.Cli
 
     }
 
+
+    /*Get the height selected and pass to next activity*/
     @Override
     public void onClick(WearableListView.ViewHolder viewHolder) {
         String height = listItems.get(viewHolder.getLayoutPosition()).toString();
@@ -71,11 +73,14 @@ public class HeightListActivity extends Activity implements WearableListView.Cli
             inflater = LayoutInflater.from(c);
         }
 
+        /* Set up the listView */
         @Override
         public WearableListView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
             return new WearableListView.ViewHolder(inflater.inflate(R.layout.row_simple_item_layout, null));
         }
 
+
+        /*Set the text in the listView*/
         @Override
         public void onBindViewHolder(WearableListView.ViewHolder viewHolder, int i) {
             TextView view = (TextView) viewHolder.itemView.findViewById(R.id.textView);
