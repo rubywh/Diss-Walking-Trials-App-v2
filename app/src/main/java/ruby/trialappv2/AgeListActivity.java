@@ -53,6 +53,7 @@ public class AgeListActivity extends Activity implements WearableListView.ClickL
         intent.putExtra(GENDER_CHOICE, gender);
         intent.putExtra(AGE_CHOICE, age);
         startActivity(intent);
+
     }
 
     @Override
