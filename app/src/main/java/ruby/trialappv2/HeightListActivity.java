@@ -18,6 +18,7 @@ public class HeightListActivity extends Activity implements WearableListView.Cli
     public final static String AGE_CHOICE = "Age Chosen";
     public final static String GENDER_CHOICE = "Gender Chosen";
     public final static String HEIGHT_CHOICE = "Height Chosen";
+    public final static String TRIAL_CHOICE = "Trial Chosen";
     private static ArrayList<Integer> listItems;
 
     /* Set up an ArrayList of items to be added as list labels*/
@@ -31,12 +32,15 @@ public class HeightListActivity extends Activity implements WearableListView.Cli
     private WearableListView listView;
     private String gender;
     private String age;
+    private String trial;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_layout);
 
+        TextView title = (TextView) findViewById(R.id.title);
+        title.setText("Please select your Height (cm)");
 
         listView = (WearableListView) findViewById(R.id.List1);
         listView.setAdapter(new MyAdapter(HeightListActivity.this));
@@ -45,6 +49,7 @@ public class HeightListActivity extends Activity implements WearableListView.Cli
         Intent received = getIntent();
         gender = received.getStringExtra(AgeListActivity.GENDER_CHOICE);
         age = received.getStringExtra(AgeListActivity.AGE_CHOICE);
+        trial = received.getStringExtra(AgeListActivity.TRIAL_CHOICE);
 
     }
 
@@ -53,12 +58,14 @@ public class HeightListActivity extends Activity implements WearableListView.Cli
     @Override
     public void onClick(WearableListView.ViewHolder viewHolder) {
         String height = listItems.get(viewHolder.getLayoutPosition()).toString();
+
         Intent intent = new Intent(this, SenseActivity.class);
         intent.putExtra(GENDER_CHOICE, gender);
         intent.putExtra(AGE_CHOICE, age);
+        intent.putExtra(TRIAL_CHOICE, trial);
         intent.putExtra(HEIGHT_CHOICE, height);
-        startActivity(intent);
 
+        startActivity(intent);
     }
 
     @Override

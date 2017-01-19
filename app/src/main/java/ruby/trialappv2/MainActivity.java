@@ -21,9 +21,8 @@ public class MainActivity extends WearableActivity {
 
     }
 
-
     public void onBeginClick(View view) {
-        Intent intent = new Intent(this, GenderListActivity.class);
+        Intent intent = new Intent(this, SelectTrialType.class);
         startActivity(intent);
         finish();
     }

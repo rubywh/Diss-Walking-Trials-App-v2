@@ -37,6 +37,16 @@
             android:onClick="onStopClick"
             android:text="@string/stop"
             android:textAppearance="@style/TextAppearance.Wearable.Large" />
+
+        <Button
+            android:id="@+id/btn3"
+            style="@android:style/Widget.Button.Small"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="onFinishClick"
+            android:text="@string/finish"
+            android:textAppearance="@style/TextAppearance.Wearable.Large" />
     </LinearLayout>
 
 </android.support.wearable.view.BoxInsetLayout>

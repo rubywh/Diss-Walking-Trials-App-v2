@@ -38,6 +38,7 @@
         <activity android:name=".HeightListActivity" />
         <activity android:name=".GenderListActivity" />
         <activity android:name=".AgeListActivity" />
+        <activity android:name=".SelectTrialType" />
 
         <service
             android:name=".WearableService"

@@ -18,6 +18,7 @@ public class AgeListActivity extends Activity implements WearableListView.ClickL
 
     public final static String AGE_CHOICE = "Age Chosen";
     public final static String GENDER_CHOICE = "Gender Chosen";
+    public final static String TRIAL_CHOICE = "Trial Chosen";
     private static ArrayList<Integer> listItems;
 
     /* Set up an ArrayList of items to be added as list labels*/
@@ -31,18 +32,23 @@ public class AgeListActivity extends Activity implements WearableListView.ClickL
     private WearableListView listView;
     private String gender;
 
+    private String trial;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_layout);
-
+        TextView title = (TextView) findViewById(R.id.title);
         Intent intent = getIntent();
         gender = intent.getStringExtra(GenderListActivity.GENDER_CHOICE);
+        trial = intent.getStringExtra(GenderListActivity.TRIAL_CHOICE);
+
+
         System.out.println(gender);
         listView = (WearableListView) findViewById(R.id.List1);
         listView.setAdapter(new AgeListActivity.MyAdapter(AgeListActivity.this));
         listView.setClickListener(AgeListActivity.this);
-
+        title.setText("Please select your Age");
     }
 
     /*Get the age selected and pass to next activity*/
@@ -52,6 +58,7 @@ public class AgeListActivity extends Activity implements WearableListView.ClickL
         Intent intent = new Intent(this, HeightListActivity.class);
         intent.putExtra(GENDER_CHOICE, gender);
         intent.putExtra(AGE_CHOICE, age);
+        intent.putExtra(TRIAL_CHOICE, trial);
         startActivity(intent);
 
     }
