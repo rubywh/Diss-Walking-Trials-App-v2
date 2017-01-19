@@ -78,7 +78,7 @@ public class GenderListActivity extends Activity implements WearableListView.Cli
         @Override
         public void onBindViewHolder(WearableListView.ViewHolder viewHolder, int i) {
             TextView view = (TextView) viewHolder.itemView.findViewById(R.id.textView);
-            view.setText(listItems.get(i).toString());
+            view.setText(listItems.get(i));
             viewHolder.itemView.setTag(i);
         }
 
