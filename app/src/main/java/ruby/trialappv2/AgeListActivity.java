@@ -29,7 +29,7 @@ public class AgeListActivity extends Activity implements WearableListView.ClickL
         }
     }
 
-    private WearableListView listView;
+    private WearableListView lv;
     private String gender;
 
     private String trial;
@@ -45,9 +45,9 @@ public class AgeListActivity extends Activity implements WearableListView.ClickL
 
 
         System.out.println(gender);
-        listView = (WearableListView) findViewById(R.id.List1);
-        listView.setAdapter(new AgeListActivity.MyAdapter(AgeListActivity.this));
-        listView.setClickListener(AgeListActivity.this);
+        lv = (WearableListView) findViewById(R.id.List1);
+        lv.setAdapter(new AgeListActivity.MyAdapter(AgeListActivity.this));
+        lv.setClickListener(AgeListActivity.this);
         title.setText("Please select your Age");
     }
 
@@ -68,26 +68,32 @@ public class AgeListActivity extends Activity implements WearableListView.ClickL
 
     }
 
-    private class MyAdapter extends WearableListView.Adapter {
+    public class MyAdapter extends WearableListView.Adapter {
 
         private final LayoutInflater inflater;
 
-        private MyAdapter(Context c) {
+        public MyAdapter(Context c) {
             inflater = LayoutInflater.from(c);
         }
 
-        /* Set up the listView */
+        //Create new views for list items
         @Override
         public WearableListView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
             return new WearableListView.ViewHolder(inflater.inflate(R.layout.row_simple_item_layout, null));
         }
 
-        /*Set the text in the listView*/
+        //Replace contents of a list item
         @Override
         public void onBindViewHolder(WearableListView.ViewHolder viewHolder, int i) {
+            //retrieve text view
             TextView view = (TextView) viewHolder.itemView.findViewById(R.id.textView);
+            //replace text
             view.setText(listItems.get(i).toString());
             viewHolder.itemView.setTag(i);
+        }
+
+        public int getThisItem(int i) {
+            return listItems.get(i);
         }
 
         @Override
@@ -95,4 +101,5 @@ public class AgeListActivity extends Activity implements WearableListView.ClickL
             return listItems.size();
         }
     }
+
 }
