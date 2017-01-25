@@ -43,7 +43,6 @@ public class AgeListActivity extends Activity implements WearableListView.ClickL
         gender = intent.getStringExtra(GenderListActivity.GENDER_CHOICE);
         trial = intent.getStringExtra(GenderListActivity.TRIAL_CHOICE);
 
-
         System.out.println(gender);
         lv = (WearableListView) findViewById(R.id.List1);
         lv.setAdapter(new AgeListActivity.MyAdapter(AgeListActivity.this));

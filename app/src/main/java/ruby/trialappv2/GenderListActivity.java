@@ -19,6 +19,7 @@ public class GenderListActivity extends Activity implements WearableListView.Cli
     public final static String GENDER_CHOICE = "Gender Chosen";
     public final static String TRIAL_CHOICE = "Trial Chosen";
     private static ArrayList<String> listItems;
+
     /* Set up an ArrayList of items to be added as list labels*/
     static {
         listItems = new ArrayList<String>();
@@ -26,6 +27,7 @@ public class GenderListActivity extends Activity implements WearableListView.Cli
         listItems.add("Female");
     }
 
+    String trial;
     private WearableListView listView;
 
     @Override
@@ -40,6 +42,9 @@ public class GenderListActivity extends Activity implements WearableListView.Cli
         listView.setAdapter(new GenderListActivity.MyAdapter(GenderListActivity.this));
         listView.setClickListener(GenderListActivity.this);
 
+        Intent received = getIntent();
+        trial = received.getStringExtra(AgeListActivity.TRIAL_CHOICE);
+
     }
 
     /*Get the gender selected and pass to next activity*/
@@ -49,6 +54,7 @@ public class GenderListActivity extends Activity implements WearableListView.Cli
         Intent intent = new Intent(this, AgeListActivity
                 .class);
         intent.putExtra(GENDER_CHOICE, msg);
+        intent.putExtra(TRIAL_CHOICE, trial);
         startActivity(intent);
 
     }

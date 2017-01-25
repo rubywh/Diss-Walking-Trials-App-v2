@@ -19,7 +19,6 @@ import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.matcher.BundleMatchers.hasEntry;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
-import static android.support.test.espresso.intent.matcher.IntentMatchers.hasExtraWithKey;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasExtras;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -29,11 +28,11 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
 /**
- * Created by ruby__000 on 24/01/2017.
+ * Created by ruby__000 on 25/01/2017.
  */
-public class AgeListActivityTest {
+public class SelectTrialTypeTest {
     @Rule
-    public ActivityTestRule<AgeListActivity> main = new ActivityTestRule<AgeListActivity>(AgeListActivity.class) {
+    public ActivityTestRule<SelectTrialType> main = new ActivityTestRule<SelectTrialType>(SelectTrialType.class) {
         @Override
         protected void beforeActivityLaunched() {
             Intents.init();
@@ -76,26 +75,29 @@ public class AgeListActivityTest {
     @Test
     public void onClick() throws Exception {
         //click random item in the list
-        int position = (int) (Math.random() * ((80 - 0) + 1)) + 0;
+        int position = (int) (Math.random() * ((1 - 0) + 1)) + 0;
         //get expected value
-        int listItem = 10 + position;
+        String listItem = null;
+
+        if (position == 0) {
+            listItem = "Arms swinging";
+        } else if (position == 1) {
+            listItem = "Hands in pockets";
+        } else if (position == 2) {
+            listItem = "Flat Shoes";
+        } else if (position == 3) {
+            listItem = "Heeled Shoes";
+        }
+
         onView(withId(R.id.List1)).perform(RecyclerViewActions.scrollToPosition(position), click());
         // onView(allOf(withId(R.id.List1), isDisplayed())).perform(click());
         //check new activity started
-        intended(hasComponent(HeightListActivity.class.getName()));
-        //check intent contains age just clicked
+        intended(hasComponent(GenderListActivity.class.getName()));
+        //check intent contains trial type just clicked
         intended((
                 hasExtras(
-                        hasEntry(equalTo("Age Chosen"), equalTo(String.valueOf(listItem))))));
+                        hasEntry(equalTo("Trial Chosen"), equalTo((listItem))))));
 
-        //Check there exists Extras for Gender Chosen and Trial Chosen
-        //At the moment these can have values ANYTHING (really, null)
-        intended((
-                hasExtraWithKey(
-                        (equalTo("Gender Chosen")))));
-        intended((
-                hasExtraWithKey(
-                        (equalTo("Trial Chosen")))));
     }
 
     @Test
@@ -109,14 +111,18 @@ public class AgeListActivityTest {
         // onView(withId(R.id.List1)).check(matches(withChild(withText("Female"))));
         WearableListView listview = (WearableListView) main.getActivity().findViewById(R.id.List1);
         onView(withId(R.id.List1)).check(matches(isDisplayed()));
+
+        //Check that there are four items in the list
         int itemCount = listview.getAdapter().getItemCount();
-        assertThat(itemCount, is(81));
+        assertThat(itemCount, is(4));
+
         assertThat(listview.isAtTop(), is(true));
     }
 
-
     @Test
     public void testTitleNAme() throws Exception {
-        onView(withId(R.id.title)).check(matches(withText("Please select your Age")));
+        onView(withId(R.id.title)).check(matches(withText("Please select Trial Type")));
     }
+
+
 }

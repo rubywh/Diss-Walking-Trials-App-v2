@@ -29,11 +29,11 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
 /**
- * Created by ruby__000 on 24/01/2017.
+ * Created by ruby__000 on 25/01/2017.
  */
-public class AgeListActivityTest {
+public class GenderListActivityTest {
     @Rule
-    public ActivityTestRule<AgeListActivity> main = new ActivityTestRule<AgeListActivity>(AgeListActivity.class) {
+    public ActivityTestRule<GenderListActivity> main = new ActivityTestRule<GenderListActivity>(GenderListActivity.class) {
         @Override
         protected void beforeActivityLaunched() {
             Intents.init();
@@ -76,23 +76,28 @@ public class AgeListActivityTest {
     @Test
     public void onClick() throws Exception {
         //click random item in the list
-        int position = (int) (Math.random() * ((80 - 0) + 1)) + 0;
+        int position = (int) (Math.random() * ((1 - 0) + 1)) + 0;
         //get expected value
-        int listItem = 10 + position;
+        String listItem;
+
+        if (position == 0) {
+            listItem = "Male";
+        } else {
+            listItem = "Female";
+        }
+
         onView(withId(R.id.List1)).perform(RecyclerViewActions.scrollToPosition(position), click());
         // onView(allOf(withId(R.id.List1), isDisplayed())).perform(click());
         //check new activity started
-        intended(hasComponent(HeightListActivity.class.getName()));
-        //check intent contains age just clicked
+        intended(hasComponent(AgeListActivity.class.getName()));
+        //check intent contains gender just clicked
         intended((
                 hasExtras(
-                        hasEntry(equalTo("Age Chosen"), equalTo(String.valueOf(listItem))))));
+                        hasEntry(equalTo("Gender Chosen"), equalTo((listItem))))));
 
-        //Check there exists Extras for Gender Chosen and Trial Chosen
+        // Check there exists Extras Trial Chosen
         //At the moment these can have values ANYTHING (really, null)
-        intended((
-                hasExtraWithKey(
-                        (equalTo("Gender Chosen")))));
+
         intended((
                 hasExtraWithKey(
                         (equalTo("Trial Chosen")))));
@@ -109,14 +114,17 @@ public class AgeListActivityTest {
         // onView(withId(R.id.List1)).check(matches(withChild(withText("Female"))));
         WearableListView listview = (WearableListView) main.getActivity().findViewById(R.id.List1);
         onView(withId(R.id.List1)).check(matches(isDisplayed()));
+
+        //Check that there are two items in the list
         int itemCount = listview.getAdapter().getItemCount();
-        assertThat(itemCount, is(81));
+        assertThat(itemCount, is(2));
+
         assertThat(listview.isAtTop(), is(true));
     }
 
-
     @Test
     public void testTitleNAme() throws Exception {
-        onView(withId(R.id.title)).check(matches(withText("Please select your Age")));
+        onView(withId(R.id.title)).check(matches(withText("Please select your Gender")));
     }
+
 }
