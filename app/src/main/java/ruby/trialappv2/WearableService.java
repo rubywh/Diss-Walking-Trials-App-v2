@@ -8,6 +8,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.AsyncTask;
+import android.os.Binder;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.SystemClock;
@@ -31,6 +32,7 @@ public class WearableService extends Service implements SensorEventListener {
     public final static String TRIAL_CHOICE = "Trial Chosen";
 
     private static final String TAG = "SenseService";
+    private final IBinder mBinder = new LocalBinder();
     Sensor senAccelerometer;
     Sensor senGyro;
     Long startTime;
@@ -104,7 +106,7 @@ public class WearableService extends Service implements SensorEventListener {
 
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mBinder;
     }
 
     /* Given gender/age/height make a file in external storage and set up print streams */
@@ -127,6 +129,13 @@ public class WearableService extends Service implements SensorEventListener {
 
     }
 
+    public class LocalBinder extends Binder {
+
+        public WearableService getService() {
+            // Return this instance of LocalService so clients can call public methods.
+            return WearableService.this;
+        }
+    }
 
     private class AccelerometerEventLoggerTask extends AsyncTask<SensorEvent, Void, Void> {
 
