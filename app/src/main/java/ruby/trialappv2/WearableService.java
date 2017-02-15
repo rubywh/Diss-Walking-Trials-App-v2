@@ -112,7 +112,7 @@ public class WearableService extends Service implements SensorEventListener {
 
 //            System.out.println(sharedQueue);  //NOTE: system.out.println is synchronous
 
-            read = read + 1;  // TODO: concurrecy issue here if there are multiple threads appending to read?
+            read = read + 1;
         }
 
         if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
@@ -132,10 +132,6 @@ public class WearableService extends Service implements SensorEventListener {
         trial = trial.replaceAll(" ", "_").toLowerCase();
 
         makeFile(trial, gender, age, height);
-
-        // TODO: you can simply use a lambda function for this, or a pointer to a regular function :)
-        // TODO: stop this thread when you've finished writing
-
 /*
         Thread prodThread = new Thread(new Producer(sharedQueue, arraylist));
         prodThread.start();
