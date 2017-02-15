@@ -78,7 +78,11 @@ public class SenseActivity extends WearableActivity {
 
     /*On click of stop button stop the running service and make the button invisible*/
     public void onStopClick(View view) {
-        this.stopService(new Intent(this, WearableService.class));
+        Intent intent = new Intent("ruby.trialapv2.testIntent");
+        intent.putExtra("value", 1);
+        sendBroadcast(intent);
+
+        //this.stopService(new Intent(this, WearableService.class));
         mBtnView2.setVisibility(View.INVISIBLE);
         mBtnView3.setVisibility(View.VISIBLE);
     }
@@ -86,6 +90,11 @@ public class SenseActivity extends WearableActivity {
     //End the application
     public void onFinishClick(View view) {
         this.finishAffinity();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 }
 
