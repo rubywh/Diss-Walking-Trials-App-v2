@@ -78,7 +78,7 @@ public class SenseActivity extends WearableActivity {
 
     /*On click of stop button stop the running service and make the button invisible*/
     public void onStopClick(View view) {
-        Intent intent = new Intent("ruby.trialapv2.testIntent");
+        Intent intent = new Intent("ruby.trialappv2.testIntent");
         intent.putExtra("value", 1);
         sendBroadcast(intent);
 

@@ -22,9 +22,10 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Locale;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Writes data to file in background
@@ -48,6 +49,8 @@ public class WearableService extends Service implements SensorEventListener {
     BufferedWriter bw;
     boolean stopped = false;
     BlockingQueue<String> sharedQueue;
+    ArrayList<String> arrayList;
+    BroadcastReceiver receiver;
     private SensorManager senSensorManager;
     private PrintStream ps;
     private PrintStream ps_gyro;
@@ -61,31 +64,31 @@ public class WearableService extends Service implements SensorEventListener {
     public void onCreate() {
 
         super.onCreate();
-        sharedQueue = new ArrayBlockingQueue(1000);
-
+        sharedQueue = new LinkedBlockingQueue<>(10000);
+        arrayList = new ArrayList<>();
 
         senSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         //get accelerometer
         senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         //  senGyro = senSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         //register the sensor, use context, name and rate at which sensor events are delivered to us.
-        senSensorManager.registerListener(this, senAccelerometer, 5000);
+        senSensorManager.registerListener(this, senAccelerometer, 1000);
         //senSensorManager.registerListener(this, senGyro, SensorManager.SENSOR_DELAY_FASTEST);
         Log.d(TAG, "Finished Creation");
 
 
         IntentFilter filter = new IntentFilter("ruby.trialappv2.testIntent");
-        BroadcastReceiver receiver = new BroadcastReceiver() {
+        receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                Log.i(TAG, "Stop clicked");
                 int value = intent.getExtras().getInt("value");
                 if (value == 1) {
                     stopped = true;
+                    stopSensing();
                     try {
-                        finishWriting();
+                        printToFile();
                     } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
@@ -104,13 +107,15 @@ public class WearableService extends Service implements SensorEventListener {
 
             thisTimestamp = String.valueOf(event.timestamp);
             String thisEvent = (thisTimestamp + ";" + event.values[0] + ";" + event.values[1] + ";" + event.values[2]);
+
             try {
                 sharedQueue.put(thisEvent);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
-//            System.out.println(sharedQueue);  //NOTE: system.out.println is synchronous
+            // arrayList.add(thisEvent);
+
 
             read = read + 1;
         }
@@ -146,49 +151,45 @@ public class WearableService extends Service implements SensorEventListener {
         return Service.START_NOT_STICKY;
     }
 
-    /*
-        public void writerMethod(){
-            Log.d(TAG, "Thread running");
-              int j;
-           for (j=0;j<1000;j++){
-                Log.d(TAG, "qsize" + String.valueOf(q.size()));
-                try {
-                    bw.write(q.poll());
-                    bw.newLine();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    */
-    public void finishWriting() throws IOException, InterruptedException {
+    public void stopSensing() {
         if (senSensorManager != null) {
             senSensorManager.unregisterListener(this);
         }
-
-               /*
-        bw.flush();
-        bw.close();
-        fw.close();
-        Log.d(TAG, "written");
-        */
     }
 
-
-    @Override
-    public void onDestroy() {
+    //post sense write to file approach
+    public void printToFile() throws IOException {
+        Log.d(TAG, "print to file");
         if (senSensorManager != null) {
             senSensorManager.unregisterListener(this);
         }
 
-        Log.d(TAG, "onDestroy");
-        super.onDestroy();
+        /*
+        Log.d(TAG, "print to file");
+        for(String str: arrayList){
+            Log.i(TAG, str);
+            bw.append(str);
+            bw.newLine();
+        }
+        */
         try {
             bw.flush();
             bw.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        onDestroy();
+    }
+
+
+    @Override
+    public void onDestroy() {
+
+        unregisterReceiver(receiver);
+        Log.d(TAG, "onDestroy");
+        super.onDestroy();
+
 
     }
 
@@ -335,7 +336,7 @@ public class WearableService extends Service implements SensorEventListener {
             Log.d(TAG, "run");
             while (true) {
                 try {
-                    bufferedWriter.write(sharedQueue.take().toString());
+                    bufferedWriter.append(sharedQueue.take().toString());
                     bufferedWriter.newLine();
                 } catch (InterruptedException | IOException e) {
                     e.printStackTrace();
