@@ -23,7 +23,7 @@ public class AgeListActivity extends Activity implements WearableListView.ClickL
 
     /* Set up an ArrayList of items to be added as list labels*/
     static {
-        listItems = new ArrayList<Integer>();
+        listItems = new ArrayList<>(90);
         for (int i = 10; i <= 90; i++) {
             listItems.add(i);
         }
@@ -59,6 +59,7 @@ public class AgeListActivity extends Activity implements WearableListView.ClickL
         intent.putExtra(AGE_CHOICE, age);
         intent.putExtra(TRIAL_CHOICE, trial);
         startActivity(intent);
+        finish();
 
     }
 

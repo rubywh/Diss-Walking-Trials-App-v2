@@ -57,6 +57,8 @@ public class GenderListActivity extends Activity implements WearableListView.Cli
         intent.putExtra(TRIAL_CHOICE, trial);
         startActivity(intent);
 
+        finish();
+
     }
 
     @Override

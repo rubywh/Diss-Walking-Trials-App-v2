@@ -66,6 +66,7 @@ public class HeightListActivity extends Activity implements WearableListView.Cli
         intent.putExtra(HEIGHT_CHOICE, height);
 
         startActivity(intent);
+        finish();
     }
 
     @Override

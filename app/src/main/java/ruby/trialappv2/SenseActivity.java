@@ -1,7 +1,10 @@
 package ruby.trialappv2;
 
 import android.app.ActivityManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.BoxInsetLayout;
@@ -25,6 +28,12 @@ public class SenseActivity extends WearableActivity {
     private Button mBtnView;
     private Button mBtnView2;
     private Button mBtnView3;
+    private final BroadcastReceiver br = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            mBtnView3.setVisibility(View.VISIBLE);
+        }
+    };
     private String gender;
     private String age;
     private String height;
@@ -51,7 +60,11 @@ public class SenseActivity extends WearableActivity {
         trial = intent.getStringExtra(HeightListActivity.TRIAL_CHOICE);
 
         System.out.println(gender + age + height);
+
+        registerReceiver(br, new IntentFilter("End"));
+
     }
+
 
     /* When start clicked, start the sensing service unless it is already running*/
     public void onStartClick(View view) {
@@ -71,7 +84,6 @@ public class SenseActivity extends WearableActivity {
         toservice.putExtra(HEIGHT_CHOICE, height);
         toservice.putExtra(TRIAL_CHOICE, trial);
         this.startService(toservice);
-
         //Make Start button invisible
         mBtnView.setVisibility(View.INVISIBLE);
     }
@@ -82,9 +94,7 @@ public class SenseActivity extends WearableActivity {
         intent.putExtra("value", 1);
         sendBroadcast(intent);
 
-        //this.stopService(new Intent(this, WearableService.class));
         mBtnView2.setVisibility(View.INVISIBLE);
-        mBtnView3.setVisibility(View.VISIBLE);
     }
 
     //End the application
@@ -96,5 +106,13 @@ public class SenseActivity extends WearableActivity {
     protected void onPause() {
         super.onPause();
     }
+
+    @Override
+    public void onDestroy() {
+        unregisterReceiver(br);
+        Log.d(TAG, "onDestroy");
+        super.onDestroy();
+    }
+
 }
 
