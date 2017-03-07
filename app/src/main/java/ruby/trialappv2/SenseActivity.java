@@ -19,24 +19,21 @@ import android.widget.Button;
 
 public class SenseActivity extends WearableActivity {
 
-    public final static String AGE_CHOICE = "Age Chosen";
-    public final static String GENDER_CHOICE = "Gender Chosen";
-    public final static String HEIGHT_CHOICE = "Height Chosen";
     public final static String TRIAL_CHOICE = "Trial Chosen";
+    public final static String PARTICIPANT_CHOICE = "Participant Chosen";
     private static final String TAG = "WearableActivity";
     private BoxInsetLayout mContainerView;
     private Button mBtnView;
     private Button mBtnView2;
     private Button mBtnView3;
+
     private final BroadcastReceiver br = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             mBtnView3.setVisibility(View.VISIBLE);
         }
     };
-    private String gender;
-    private String age;
-    private String height;
+    private String pNumber;
     private String trial;
 
     @Override
@@ -54,13 +51,9 @@ public class SenseActivity extends WearableActivity {
         mBtnView2.setVisibility(View.INVISIBLE);
 
         Intent intent = getIntent();
-        gender = intent.getStringExtra(HeightListActivity.GENDER_CHOICE);
-        age = intent.getStringExtra(HeightListActivity.AGE_CHOICE);
-        height = intent.getStringExtra(HeightListActivity.HEIGHT_CHOICE);
-        trial = intent.getStringExtra(HeightListActivity.TRIAL_CHOICE);
 
-        System.out.println(gender + age + height);
-
+        pNumber = intent.getStringExtra(ParticipantActivity.PARTICIPANT_NUMBER);
+        trial = intent.getStringExtra(ParticipantActivity.TRIAL_CHOICE);
         registerReceiver(br, new IntentFilter("End"));
 
     }
@@ -79,10 +72,8 @@ public class SenseActivity extends WearableActivity {
         }
         //Send the intent with the user chosen values
         Intent toservice = new Intent(this, WearableService.class);
-        toservice.putExtra(GENDER_CHOICE, gender);
-        toservice.putExtra(AGE_CHOICE, age);
-        toservice.putExtra(HEIGHT_CHOICE, height);
         toservice.putExtra(TRIAL_CHOICE, trial);
+        toservice.putExtra(PARTICIPANT_CHOICE, pNumber);
         this.startService(toservice);
         //Make Start button invisible
         mBtnView.setVisibility(View.INVISIBLE);

@@ -22,10 +22,10 @@ public class SelectTrialType extends Activity implements WearableListView.ClickL
     /* Set up an ArrayList of items to be added as list labels*/
     static {
         listItems = new ArrayList<String>(4);
-        listItems.add("Arms swinging");
-        listItems.add("Hands in pockets");
-        listItems.add("Flat Shoes");
-        listItems.add("Heeled Shoes");
+        listItems.add("Arms swinging consistent");
+        listItems.add("Hands pockets consistent");
+        listItems.add("Arms swinging varying");
+        listItems.add("Hands pockets varying");
     }
 
     private WearableListView listView;
@@ -46,7 +46,7 @@ public class SelectTrialType extends Activity implements WearableListView.ClickL
     @Override
     public void onClick(WearableListView.ViewHolder viewHolder) {
         String msg = listItems.get(viewHolder.getLayoutPosition());
-        Intent intent = new Intent(this, GenderListActivity.class);
+        Intent intent = new Intent(this, ParticipantActivity.class);
         intent.putExtra(TRIAL_CHOICE, msg);
         startActivity(intent);
         finish();

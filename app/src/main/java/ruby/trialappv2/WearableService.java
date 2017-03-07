@@ -12,53 +12,61 @@ import android.hardware.SensorManager;
 import android.os.Binder;
 import android.os.Environment;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * post sense write with consumer thread
  */
 
 public class WearableService extends Service implements SensorEventListener {
-    public final static String AGE_CHOICE = "Age Chosen";
-    public final static String GENDER_CHOICE = "Gender Chosen";
-    public final static String HEIGHT_CHOICE = "Height Chosen";
     public final static String TRIAL_CHOICE = "Trial Chosen";
+    public final static String PARTICIPANT_CHOICE = "Participant Chosen";
 
     private static final String TAG = "SenseService";
 
     //private static Queue<String> q = new ArrayDeque<String>();
     private final IBinder mBinder = new LocalBinder();
     Sensor senAccelerometer;
+    Sensor senGyro;
     boolean stopped = false;
-    // BlockingQueue<String> sharedQueue;
-    ArrayList<String> arrayList;
     BroadcastReceiver receiver;
-    Thread consThread;
-    int written = 0;
-    int added = 0;
+    ArrayList<String> accArrayList;
+    ArrayList<String> gyroArrayList;
+    Thread aConsThread;
+
+    Thread gConsThread;
     private SensorManager senSensorManager;
-    private FileWriter writer;
-    private BufferedWriter bufferedWriter;
+    private FileWriter accWriter;
+    private FileWriter gyroWriter;
+    private BufferedWriter aBufferedWriter;
+    private BufferedWriter gBufferedWriter;
+    private PowerManager.WakeLock mWakeLock;
 
     @Override
     public void onCreate() {
 
         super.onCreate();
         // sharedQueue = new LinkedBlockingQueue<>();
-        arrayList = new ArrayList<>();
+        accArrayList = new ArrayList<>();
+        gyroArrayList = new ArrayList<>();
 
         senSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         //get accelerometer
         senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        //  senGyro = senSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+
+        senGyro = senSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         //register the sensor, use context, name and rate at which sensor events are delivered to us.
-        senSensorManager.registerListener(this, senAccelerometer, 100000);
+        senSensorManager.registerListener(this, senAccelerometer, 20000);
+        senSensorManager.registerListener(this, senGyro, 20000);
         //senSensorManager.registerListener(this, senGyro, SensorManager.SENSOR_DELAY_FASTEST);
         Log.d(TAG, "Finished Creation");
 
@@ -90,13 +98,11 @@ public class WearableService extends Service implements SensorEventListener {
 
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
 
-            //sharedQueue.put(event.timestamp + ";" + event.values[0] + ";" + event.values[1] + ";" + event.values[2] + "\n");
-            arrayList.add(event.timestamp + ";" + event.values[0] + ";" + event.values[1] + ";" + event.values[2] + "\n");
-            added = added + 1;
+            accArrayList.add(event.timestamp + ";" + event.values[0] + ";" + event.values[1] + ";" + event.values[2] + "\n");
+        } else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
 
-
+            gyroArrayList.add(event.timestamp + ";" + event.values[0] + ";" + event.values[1] + ";" + event.values[2] + "\n");
         }
-
     }
 
 
@@ -104,22 +110,21 @@ public class WearableService extends Service implements SensorEventListener {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "My Tag");
+        mWakeLock.acquire();
         Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
-        String gender = intent.getStringExtra(GENDER_CHOICE);
-        String age = intent.getStringExtra(AGE_CHOICE);
-        String height = intent.getStringExtra(HEIGHT_CHOICE);
         String trial = intent.getStringExtra(TRIAL_CHOICE);
+        String pNumber = intent.getStringExtra(PARTICIPANT_CHOICE);
         trial = trial.replaceAll(" ", "_").toLowerCase();
 
         try {
-            makeFile(trial, gender, age, height);
+            makeFile(trial, pNumber);
         } catch (IOException e) {
             e.printStackTrace();
         }
-/*
-        Thread prodThread = new Thread(new Producer(sharedQueue, arraylist));
-        prodThread.start();
-        */
+
 
         Log.d(TAG, "onStartCommand Finished");
 
@@ -131,14 +136,18 @@ public class WearableService extends Service implements SensorEventListener {
             senSensorManager.unregisterListener(this);
         }
 
-        consThread = new Thread(new Consumer(arrayList, bufferedWriter));
-        consThread.start();
+        aConsThread = new Thread(new accelerometerConsumer(accArrayList, aBufferedWriter));
+        aConsThread.start();
         Log.d(TAG, "start cons thread called");
-        consThread.join();
-        bufferedWriter.close();
-        Log.d(TAG, added + " " + written);
-        Log.d(TAG, "buffered writer closed");
-        writer.close();
+        aConsThread.join();
+        aBufferedWriter.close();
+        accWriter.close();
+
+        gConsThread = new Thread(new gyroConsumer(gyroArrayList, gBufferedWriter));
+        gConsThread.start();
+        gConsThread.join();
+        gBufferedWriter.close();
+
         sendBroadcast(new Intent("End"));
         stopSelf();
         Log.d(TAG, "on destroy called");
@@ -146,7 +155,7 @@ public class WearableService extends Service implements SensorEventListener {
 
     @Override
     public void onDestroy() {
-
+        mWakeLock.release();
         unregisterReceiver(receiver);
         Log.d(TAG, "onDestroy");
         super.onDestroy();
@@ -163,12 +172,16 @@ public class WearableService extends Service implements SensorEventListener {
     }
 
     /* Given gender/age/height make a file in external storage and set up print streams */
-    public void makeFile(String trial, String gender, String age, String height) throws IOException {
+    public void makeFile(String trial, String pNumber) throws IOException {
 
+        Date now = new Date();
+        String stringDate = new SimpleDateFormat("ddMMyyyyHHmm").format(now);
+        accWriter = new FileWriter(Environment.getExternalStorageDirectory().toString() + "/" + pNumber + "_" + trial + "_" + stringDate + "_accelerometer.dat");
 
-        writer = new FileWriter(Environment.getExternalStorageDirectory().toString() + "/" + trial + "_" + gender + "_" +
-                age + "_" + height + "_accelerometer.dat");
-        bufferedWriter = new BufferedWriter(writer);
+        gyroWriter = new FileWriter(Environment.getExternalStorageDirectory().toString() + "/" + pNumber + "_" + trial + "_" + stringDate + "_gyroscope.dat");
+
+        aBufferedWriter = new BufferedWriter(accWriter);
+        gBufferedWriter = new BufferedWriter(gyroWriter);
 
 
     }
@@ -182,43 +195,12 @@ public class WearableService extends Service implements SensorEventListener {
         }
     }
 
-      /*
-    class Producer implements Runnable {
-        private final BlockingQueue sharedQueue;
-        private final ArrayList<String> arraylist;
-        private static final String TAG = "ProducerThread";
-
-        public Producer(BlockingQueue sharedQueue, ArrayList arraylist) {
-            this.sharedQueue = sharedQueue;
-            this.arraylist = arraylist;
-
-            Log.d(TAG, "Producer Created");
-        }
-
-        @Override
-        public void run() {
-            Log.d(TAG, "run");
-            int i = 0;
-            while(true){
-                    try {
-                        sharedQueue.put(arraylist.get(i));
-                        i++;
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-    }
-    */
-
-
-    class Consumer implements Runnable {
+    class accelerometerConsumer implements Runnable {
         private static final String TAG = "ConsumerThread";
         private final ArrayList<String> arrayList;
         private BufferedWriter bufferedWriter;
 
-        public Consumer(ArrayList<String> arrayList, BufferedWriter buf) {
+        public accelerometerConsumer(ArrayList<String> arrayList, BufferedWriter buf) {
             this.arrayList = arrayList;
             this.bufferedWriter = buf;
 
@@ -232,16 +214,43 @@ public class WearableService extends Service implements SensorEventListener {
             for (String str : arrayList) {
 
                 try {
+                    Log.d(TAG, str);
                     bufferedWriter.append(str);
-                    written = written + 1;
-                    bufferedWriter.flush();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    // TODO: quit the thread + app at this point?
                 }
             }
         }
     }
+
+    class gyroConsumer implements Runnable {
+        private static final String TAG = "ConsumerThread";
+        private final ArrayList<String> arrayList;
+        private BufferedWriter bufferedWriter;
+
+        public gyroConsumer(ArrayList<String> arrayList, BufferedWriter buf) {
+            this.arrayList = arrayList;
+            this.bufferedWriter = buf;
+
+            Log.d(TAG, "Consumer Created");
+        }
+
+        @Override
+        public void run() {
+            Log.d(TAG, "run");
+
+            for (String str : arrayList) {
+
+                try {
+                    Log.d(TAG, str);
+                    bufferedWriter.append(str);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
 }
 
 

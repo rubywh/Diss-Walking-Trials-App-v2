@@ -40,10 +40,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".SenseActivity" />
-        <activity android:name=".HeightListActivity" />
-        <activity android:name=".GenderListActivity" />
-        <activity android:name=".AgeListActivity" />
         <activity android:name=".SelectTrialType" />
+
+        <activity android:name=".ParticipantActivity" />
 
         <service
             android:name=".WearableService"

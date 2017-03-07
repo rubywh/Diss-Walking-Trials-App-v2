@@ -14,23 +14,21 @@ import java.util.ArrayList;
 
 /* An Activity that allows the user to select their age from a list of options*/
 
-public class AgeListActivity extends Activity implements WearableListView.ClickListener {
+public class ParticipantActivity extends Activity implements WearableListView.ClickListener {
 
-    public final static String AGE_CHOICE = "Age Chosen";
-    public final static String GENDER_CHOICE = "Gender Chosen";
+    public final static String PARTICIPANT_NUMBER = "Participant Number";
     public final static String TRIAL_CHOICE = "Trial Chosen";
     private static ArrayList<Integer> listItems;
 
     /* Set up an ArrayList of items to be added as list labels*/
     static {
-        listItems = new ArrayList<>(90);
-        for (int i = 10; i <= 90; i++) {
+        listItems = new ArrayList<>(50);
+        for (int i = 1; i <= 50; i++) {
             listItems.add(i);
         }
     }
 
     private WearableListView lv;
-    private String gender;
 
     private String trial;
 
@@ -40,24 +38,21 @@ public class AgeListActivity extends Activity implements WearableListView.ClickL
         setContentView(R.layout.list_layout);
         TextView title = (TextView) findViewById(R.id.title);
         Intent intent = getIntent();
-        gender = intent.getStringExtra(GenderListActivity.GENDER_CHOICE);
-        trial = intent.getStringExtra(GenderListActivity.TRIAL_CHOICE);
+        trial = intent.getStringExtra(SelectTrialType.TRIAL_CHOICE);
 
-        System.out.println(gender);
         lv = (WearableListView) findViewById(R.id.List1);
-        lv.setAdapter(new AgeListActivity.MyAdapter(AgeListActivity.this));
-        lv.setClickListener(AgeListActivity.this);
-        title.setText("Please select your Age");
+        lv.setAdapter(new ParticipantActivity.MyAdapter(ParticipantActivity.this));
+        lv.setClickListener(ParticipantActivity.this);
+        title.setText("Please select your participant number");
     }
 
     /*Get the age selected and pass to next activity*/
     @Override
     public void onClick(WearableListView.ViewHolder viewHolder) {
-        String age = listItems.get(viewHolder.getLayoutPosition()).toString();
-        Intent intent = new Intent(this, HeightListActivity.class);
-        intent.putExtra(GENDER_CHOICE, gender);
-        intent.putExtra(AGE_CHOICE, age);
+        String participantNo = listItems.get(viewHolder.getLayoutPosition()).toString();
+        Intent intent = new Intent(this, SenseActivity.class);
         intent.putExtra(TRIAL_CHOICE, trial);
+        intent.putExtra(PARTICIPANT_NUMBER, participantNo);
         startActivity(intent);
         finish();
 
